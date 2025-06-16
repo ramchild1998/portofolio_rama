@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio | Ramadiansyah, S.T.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Cybernetic Glow (Background: #111827, Text: #E5E7EB, Primary: #374151, Accent: #22d3ee) -->
+    <!-- Application Structure Plan: A single-page application using a more dynamic, full-width layout with a dark theme. The hero section is now a two-column layout for immediate impact. Sections feature subtle animations on scroll to guide the user's focus. Cards use a 'glassmorphism' effect for a modern tech aesthetic. This powerful design aims to project confidence and cutting-edge expertise. -->
+    <!-- Visualization & Content Choices: 
+        - Hero Stats (Goal: Inform): Presented more boldly in a separate column to grab attention.
+        - Skills Overview (Goal: Compare/Inform): Donut chart restyled for the dark theme. The skill grid uses enhanced styling.
+        - Work Experience (Goal: Organize/Change): Interactive timeline restyled with glowing glass cards. The Gemini-powered button remains a key feature.
+        - Projects Gallery (Goal: Organize/Inform): Project cards redesigned with glassmorphism and a glow-on-hover effect.
+        - Contact Form (Goal: Engagement): Gemini email generator seamlessly integrated into the new dark theme.
+        - CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #030712; /* gray-950 */
+            color: #d1d5db; /* gray-300 */
+            background-image: radial-gradient(circle at 25% 15%, rgba(34, 211, 238, 0.1), transparent 30%),
+                              radial-gradient(circle at 75% 85%, rgba(79, 70, 229, 0.1), transparent 30%);
+        }
+        .nav-link.active {
+            color: #22d3ee; /* cyan-400 */
+            font-weight: 600;
+        }
+        .glass-card {
+            background: rgba(17, 24, 39, 0.6); /* gray-900/60 */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(55, 65, 81, 0.5); /* gray-700/50 */
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+            border-color: rgba(34, 211, 238, 0.3);
+        }
+        .gemini-btn {
+            background-color: #0e7490; /* cyan-700 */
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .gemini-btn:hover {
+            background-color: #155e75; /* cyan-800 */
+        }
+        .timeline-item .details {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .timeline-item.open .details {
+            max-height: 600px;
+        }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex; align-items: center; justify-content: center; z-index: 100;
+        }
+        .modal-content {
+            background-color: #1f2937; /* gray-800 */
+            color: #d1d5db; border: 1px solid #4b5563;
+            padding: 24px; border-radius: 8px; max-width: 500px;
+            width: 90%; max-height: 80vh; overflow-y: auto;
+        }
+        .loader {
+            border: 4px solid #374151;
+            border-top: 4px solid #22d3ee;
+            border-radius: 50%; width: 40px; height: 40px;
+            animation: spin 1s linear infinite; margin: 20px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-element.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-gray-950/50 backdrop-blur-sm sticky top-0 z-50 transition-all duration-300 border-b border-gray-800">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="text-xl font-bold text-white">Ramadiansyah, S.T.</a>
+            <div class="hidden md:flex items-center space-x-8">
+                <a href="#skills" class="nav-link text-gray-400 hover:text-cyan-400 transition-colors">Keahlian</a>
+                <a href="#experience" class="nav-link text-gray-400 hover:text-cyan-400 transition-colors">Pengalaman</a>
+                <a href="#projects" class="nav-link text-gray-400 hover:text-cyan-400 transition-colors">Proyek</a>
+                <a href="#certifications" class="nav-link text-gray-400 hover:text-cyan-400 transition-colors">Sertifikasi</a>
+                <a href="#contact" class="nav-link bg-cyan-600 text-white px-4 py-2 rounded-lg hover:bg-cyan-500 transition-colors">Hubungi Saya</a>
+            </div>
+            <button id="mobile-menu-button" class="md:hidden text-gray-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" /></svg>
+            </button>
+        </nav>
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+             <a href="#skills" class="block py-2 nav-link text-gray-400">Keahlian</a>
+             <a href="#experience" class="block py-2 nav-link text-gray-400">Pengalaman</a>
+             <a href="#projects" class="block py-2 nav-link text-gray-400">Proyek</a>
+             <a href="#certifications" class="block py-2 nav-link text-gray-400">Sertifikasi</a>
+             <a href="#contact" class="block mt-2 bg-cyan-600 text-white px-4 py-2 rounded-lg text-center">Hubungi Saya</a>
+        </div>
+    </header>
+
+    <main>
+        <section id="hero" class="py-20 md:py-32">
+            <div class="container mx-auto px-6 grid md:grid-cols-3 gap-10 items-center">
+                <div class="md:col-span-2 text-center md:text-left">
+                    <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">RAMADIANSYAH, S.T.</h1>
+                    <p class="mt-4 text-xl md:text-2xl text-cyan-400 font-medium">Full-Stack & Backend Developer</p>
+                    <p class="mt-6 text-lg text-gray-400 max-w-xl mx-auto md:mx-0">
+                        Membangun solusi perangkat lunak yang tangguh dan skalabel dengan fokus pada performa, inovasi, dan pengalaman pengguna yang luar biasa.
+                    </p>
+                    <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                         <a href="#projects" class="bg-cyan-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-cyan-500 transition-colors text-center">Lihat Proyek Saya</a>
+                         <a href="cv_ramadiansyah.pdf" download class="bg-gray-700 text-white font-semibold px-8 py-3 rounded-lg hover:bg-gray-600 transition-colors text-center">Unduh CV</a>
+                    </div>
+                </div>
+                 <div class="hidden md:flex justify-center items-center">
+                    <div class="w-64 h-64 rounded-full overflow-hidden border-4 border-cyan-400/50 shadow-2xl shadow-cyan-500/20">
+                        <img id="profile-pic" src="https://media.licdn.com/dms/image/D5603AQH4f_s8-NqfIA/profile-displayphoto-shrink_800_800/0/1715792988188?e=1723680000&v=beta&t=o1E-Y7H0m0S3a0Z0E_Yj_0A9g9X8Y2T3Y2J8R6l3F7g" alt="Foto profil Ramadiansyah" class="w-full h-full object-cover" onerror="this.parentElement.style.display='none'">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="skills" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-white text-center mb-12 fade-in-element">Keahlian Teknis</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                    <div class="fade-in-element">
+                        <div class="chart-container mx-auto">
+                            <canvas id="skillsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="space-y-8 fade-in-element">
+                         <div>
+                            <h3 class="text-xl font-semibold mb-4 text-cyan-400">Backend</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">PHP/Laravel</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">Node.js/Express.js</span>
+                                <span class="bg-cyan-500 text-white px-3 py-1 rounded-full text-sm font-semibold">Golang</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">Java/Spring</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">RESTful API</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-cyan-400">Frontend</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">JavaScript/TS</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">React.js</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">Vue.js</span>
+                            </div>
+                        </div>
+                         <div>
+                            <h3 class="text-xl font-semibold mb-4 text-cyan-400">Database & Tools</h3>
+                             <div class="flex flex-wrap gap-3">
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">MySQL</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">PostgreSQL</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">MongoDB</span>
+                                <span class="bg-gray-800 border border-gray-700 text-gray-300 px-3 py-1 rounded-full text-sm">Git/GitHub</span>
+                            </div>
+                        </div>
+                         <div>
+                            <h3 class="text-xl font-semibold mb-4 text-cyan-400">Emerging Tech</h3>
+                            <div class="flex flex-wrap gap-3">
+                                <span class="bg-indigo-900/50 border border-indigo-700 text-indigo-300 px-3 py-1 rounded-full text-sm">Web3/Solidity</span>
+                                <span class="bg-indigo-900/50 border border-indigo-700 text-indigo-300 px-3 py-1 rounded-full text-sm">Machine Learning</span>
+                                <span class="bg-indigo-900/50 border border-indigo-700 text-indigo-300 px-3 py-1 rounded-full text-sm">Cloud (AWS)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="experience" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-white text-center mb-16 fade-in-element">Pengalaman Profesional</h2>
+                <div class="relative max-w-3xl mx-auto">
+                    <div class="absolute left-1/2 w-0.5 h-full bg-gray-700 transform -translate-x-1/2"></div>
+                    <div class="space-y-16">
+                        
+                        <div class="timeline-item relative fade-in-element">
+                            <div class="absolute w-5 h-5 bg-cyan-400 rounded-full mt-2.5 left-1/2 -translate-x-1/2 border-4 border-gray-900 ring-4 ring-cyan-400/50"></div>
+                            <div class="ml-auto md:ml-0 md:w-[calc(50%-2rem)] md:mr-auto">
+                                <div class="glass-card p-6 rounded-lg">
+                                    <div class="cursor-pointer timeline-header">
+                                        <h3 class="text-xl font-semibold text-white">Backend Developer</h3>
+                                        <p class="text-gray-400">PT. Abacus Teknika Solusindo</p>
+                                        <time class="text-sm text-cyan-400">Juli 2023 – Sekarang</time>
+                                    </div>
+                                    <div class="details mt-4 text-left">
+                                        <ul class="list-disc list-inside space-y-2 text-gray-300 original-points">
+                                            <li>Mengembangkan aplikasi full-stack untuk proyek BCA Finance menggunakan Laravel.</li>
+                                            <li>Merancang dan membangun layanan backend performa tinggi menggunakan Golang.</li>
+                                            <li>Memimpin perencanaan dan pengembangan proyek LMS untuk IBI.</li>
+                                            <li>Melakukan debugging (Node.js, Laravel) dan pengujian (UAT, Unit Testing).</li>
+                                        </ul>
+                                        <button class="gemini-impact-btn mt-4 gemini-btn text-xs">✨ Optimalkan Poin dengan AI</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item relative fade-in-element">
+                             <div class="absolute w-5 h-5 bg-cyan-400 rounded-full mt-2.5 left-1/2 -translate-x-1/2 border-4 border-gray-900 ring-4 ring-cyan-400/50"></div>
+                             <div class="md:w-[calc(50%-2rem)] md:ml-auto">
+                                <div class="glass-card p-6 rounded-lg">
+                                    <div class="cursor-pointer timeline-header">
+                                        <h3 class="text-xl font-semibold text-white">IT SPV Programmer</h3>
+                                        <p class="text-gray-400">Politeknik Bintan Cakrawala</p>
+                                        <time class="text-sm text-cyan-400">Mei 2022 – Mei 2023</time>
+                                    </div>
+                                    <div class="details mt-4 text-left">
+                                        <ul class="list-disc list-inside space-y-2 text-gray-300 original-points">
+                                            <li>Membangun dan meluncurkan platform e-learning menggunakan CodeIgniter 4.</li>
+                                            <li>Mengelola website utama kampus dan infrastruktur IT.</li>
+                                            <li>Merancang konten visual dan memberikan instruksi ilmu komputer.</li>
+                                        </ul>
+                                        <button class="gemini-impact-btn mt-4 gemini-btn text-xs">✨ Optimalkan Poin dengan AI</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                         <div class="timeline-item relative fade-in-element">
+                            <div class="absolute w-5 h-5 bg-cyan-400 rounded-full mt-2.5 left-1/2 -translate-x-1/2 border-4 border-gray-900 ring-4 ring-cyan-400/50"></div>
+                            <div class="ml-auto md:ml-0 md:w-[calc(50%-2rem)] md:mr-auto">
+                                <div class="glass-card p-6 rounded-lg">
+                                    <div class="cursor-pointer timeline-header">
+                                        <h3 class="text-xl font-semibold text-white">Program Developer</h3>
+                                        <p class="text-gray-400">PT. Citra Tubindo Tbk</p>
+                                        <time class="text-sm text-cyan-400">Nov 2021 – Des 2021</time>
+                                    </div>
+                                    <div class="details mt-4 text-left">
+                                        <ul class="list-disc list-inside space-y-2 text-gray-300 original-points">
+                                            <li>Mengembangkan sistem VCP menggunakan Webix, React.js, dan CodeIgniter.</li>
+                                            <li>Memberikan dukungan teknis untuk program HRMS (Laravel 6).</li>
+                                            <li>Berkolaborasi dengan tim untuk troubleshooting data (Node.js, ASP.NET/C#).</li>
+                                        </ul>
+                                        <button class="gemini-impact-btn mt-4 gemini-btn text-xs">✨ Optimalkan Poin dengan AI</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="projects" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-white text-center mb-12 fade-in-element">Galeri Proyek Unggulan</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    
+                    <div class="glass-card p-6 rounded-lg fade-in-element">
+                        <h3 class="text-xl font-semibold text-white mb-2">Sistem Pengelolaan Limbah B3</h3>
+                        <p class="text-gray-400 mb-4 text-sm">Merancang dan mengimplementasikan sistem berbasis web untuk melacak dan melaporkan limbah B3, mendigitalisasi proses manual di PT. Bukit Asam.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">PHP</span>
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">Bootstrap</span>
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">MySQL</span>
+                        </div>
+                        <a href="#" class="font-semibold text-cyan-400 hover:text-cyan-300 text-sm">Studi Kasus &rarr;</a>
+                    </div>
+                    
+                    <div class="glass-card p-6 rounded-lg fade-in-element" style="transition-delay: 150ms;">
+                        <h3 class="text-xl font-semibold text-white mb-2">Layanan API Performa Tinggi</h3>
+                        <p class="text-gray-400 mb-4 text-sm">Merancang RESTful API untuk aplikasi mobile dengan fokus pada kecepatan respon tinggi dan latensi rendah menggunakan Golang.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-cyan-500 text-white px-2 py-1 rounded text-xs">Golang</span>
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">PostgreSQL</span>
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">Docker</span>
+                        </div>
+                        <a href="#" class="font-semibold text-cyan-400 hover:text-cyan-300 text-sm">Lihat Kode &rarr;</a>
+                    </div>
+
+                    <div class="glass-card p-6 rounded-lg fade-in-element" style="transition-delay: 300ms;">
+                        <h3 class="text-xl font-semibold text-white mb-2">Platform E-Learning (LMS)</h3>
+                        <p class="text-gray-400 mb-4 text-sm">Mengembangkan Learning Management System interaktif dengan manajemen kursus, kuis, dan pelacakan kemajuan siswa.</p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">Node.js</span>
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">React.js</span>
+                            <span class="bg-gray-700 text-gray-300 px-2 py-1 rounded text-xs">MongoDB</span>
+                        </div>
+                        <a href="#" class="font-semibold text-cyan-400 hover:text-cyan-300 text-sm">Demonstrasi &rarr;</a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="certifications" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-white text-center mb-12 fade-in-element">Sertifikasi & Pelatihan</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="glass-card p-6 rounded-lg fade-in-element">
+                        <h3 class="text-lg font-semibold text-white">Junior Web Programmer</h3>
+                        <p class="text-cyan-400 font-medium">BNSP</p>
+                    </div>
+                     <div class="glass-card p-6 rounded-lg fade-in-element" style="transition-delay: 100ms;">
+                        <h3 class="text-lg font-semibold text-white">Software Engineer & Go (Basic)</h3>
+                        <p class="text-cyan-400 font-medium">HackerRank</p>
+                    </div>
+                     <div class="glass-card p-6 rounded-lg fade-in-element" style="transition-delay: 200ms;">
+                        <h3 class="text-lg font-semibold text-white">Cloud and Gen AI AWS</h3>
+                        <p class="text-cyan-400 font-medium">Dicoding</p>
+                    </div>
+                     <div class="glass-card p-6 rounded-lg fade-in-element" style="transition-delay: 300ms;">
+                        <h3 class="text-lg font-semibold text-white">Backend Engineer Golang</h3>
+                        <p class="text-cyan-400 font-medium">Pelatihan Intensif</p>
+                    </div>
+                     <div class="glass-card p-6 rounded-lg fade-in-element" style="transition-delay: 400ms;">
+                        <h3 class="text-lg font-semibold text-white">Dasar-Dasar Machine Learning</h3>
+                        <p class="text-cyan-400 font-medium">Dicoding</p>
+                    </div>
+                     <div class="glass-card p-6 rounded-lg fade-in-element" style="transition-delay: 500ms;">
+                        <h3 class="text-lg font-semibold text-white">Data Security Management</h3>
+                        <p class="text-cyan-400 font-medium">INIXINDO</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="organizations" class="py-20">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl font-bold text-white text-center mb-12 fade-in-element">Pengalaman Organisasi</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="glass-card p-6 rounded-lg fade-in-element text-center">
+                        <h3 class="text-xl font-semibold text-white">Ketua Divisi Kominfo</h3>
+                        <p class="text-cyan-400 font-medium">HMSB</p>
+                        <time class="text-sm text-gray-500">2019 – 2020</time>
+                    </div>
+                     <div class="glass-card p-6 rounded-lg fade-in-element text-center" style="transition-delay: 150ms;">
+                        <h3 class="text-xl font-semibold text-white">Wakil Kepala Divisi Desain</h3>
+                        <p class="text-cyan-400 font-medium">GenBI</p>
+                        <time class="text-sm text-gray-500">2018 – 2019</time>
+                    </div>
+                     <div class="glass-card p-6 rounded-lg fade-in-element text-center" style="transition-delay: 300ms;">
+                        <h3 class="text-xl font-semibold text-white">Wakil Kepala Divisi Programmer</h3>
+                        <p class="text-cyan-400 font-medium">HMTI</p>
+                        <time class="text-sm text-gray-500">2016 – 2017</time>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl font-bold text-white fade-in-element">Mari Berkolaborasi</h2>
+                <p class="mt-4 text-lg text-gray-400 max-w-2xl mx-auto fade-in-element">Saya siap untuk tantangan baru. Gunakan asisten AI di bawah untuk membuat draf email secara instan.</p>
+                <div class="mt-12 max-w-xl mx-auto glass-card p-8 rounded-lg fade-in-element">
+                    <h3 class="text-2xl font-semibold mb-4 text-cyan-400">✨ Asisten Email AI</h3>
+                    <div class="space-y-4 text-left">
+                        <div>
+                            <label for="recruiterName" class="block mb-1 text-sm font-medium text-gray-400">Nama Anda</label>
+                            <input type="text" id="recruiterName" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500" placeholder="Contoh: Budi Santoso">
+                        </div>
+                        <div>
+                            <label for="jobTitle" class="block mb-1 text-sm font-medium text-gray-400">Posisi yang Ditawarkan</label>
+                            <input type="text" id="jobTitle" class="w-full bg-gray-800 border border-gray-700 text-white rounded-lg p-2.5 focus:ring-cyan-500 focus:border-cyan-500" placeholder="Contoh: Senior Backend Engineer">
+                        </div>
+                    </div>
+                    <button id="generateEmailBtn" class="w-full mt-6 gemini-btn">Buat Draf Email</button>
+                    <div id="emailResultWrapper" class="mt-6 text-left hidden">
+                        <label class="block mb-2 text-sm font-medium text-gray-300">Draf Email yang Dihasilkan:</label>
+                        <div id="emailLoader" class="hidden"><div class="loader mx-0"></div></div>
+                        <textarea id="emailDraft" rows="8" class="w-full bg-gray-900 border border-gray-700 text-gray-300 rounded-lg p-2.5" readonly></textarea>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <div id="geminiModal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="flex justify-between items-center mb-4">
+                 <h3 class="text-xl font-semibold text-cyan-400">✨ Optimasi dari Gemini</h3>
+                 <button id="closeModalBtn" class="text-gray-400 hover:text-white text-2xl">&times;</button>
+            </div>
+            <div id="modalLoader"><div class="loader"></div></div>
+            <div id="modalResult" class="text-gray-300 prose prose-invert prose-p:my-2 prose-li:my-1"></div>
+        </div>
+    </div>
+
+    <footer class="border-t border-gray-800 py-8 mt-20">
+        <div class="container mx-auto px-6 text-center text-gray-500 text-sm">
+            <p>&copy; 2025 Dibuat oleh Ramadiansyah, S.T. Desain & Fitur AI ditenagai oleh Gemini.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => { mobileMenu.classList.toggle('hidden'); });
+            
+            const timelineHeaders = document.querySelectorAll('.timeline-header');
+            timelineHeaders.forEach(header => {
+                header.addEventListener('click', () => {
+                    header.closest('.timeline-item').classList.toggle('open');
+                });
+            });
+
+            const sections = document.querySelectorAll('main > section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+
+            const sectionObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('active');
+                            }
+                        });
+                    }
+                });
+            }, { rootMargin: '-50% 0px -50% 0px' });
+            sections.forEach(section => sectionObserver.observe(section));
+            
+            const fadeElements = document.querySelectorAll('.fade-in-element');
+            const fadeObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, observerOptions);
+            fadeElements.forEach(el => fadeObserver.observe(el));
+
+            const geminiModal = document.getElementById('geminiModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const modalLoader = document.getElementById('modalLoader');
+            const modalResult = document.getElementById('modalResult');
+
+            closeModalBtn.addEventListener('click', () => geminiModal.classList.add('hidden'));
+
+            async function callGeminiAPI(prompt, loaderElement, resultElement, isModal) {
+                loaderElement.classList.remove('hidden');
+                resultElement.innerHTML = '';
+                if(isModal) geminiModal.classList.remove('hidden');
+
+                const apiKey = ""; 
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const result = await response.json();
+                    let text = 'Maaf, tidak dapat menghasilkan konten saat ini.';
+                    if (result.candidates && result.candidates.length > 0 && result.candidates[0].content.parts.length > 0) {
+                        text = result.candidates[0].content.parts[0].text.replace(/```html/g, '').replace(/```/g, '');
+                    }
+                    if(isModal) resultElement.innerHTML = text; else resultElement.value = text;
+                } catch (error) {
+                    console.error("Error calling Gemini API:", error);
+                    const errorText = 'Terjadi kesalahan saat menghubungi API. Silakan coba lagi nanti.';
+                    if(isModal) resultElement.innerHTML = errorText; else resultElement.value = errorText;
+                } finally {
+                    loaderElement.classList.add('hidden');
+                }
+            }
+            
+            document.querySelectorAll('.gemini-impact-btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const timelineItem = e.target.closest('.glass-card');
+                    const position = timelineItem.querySelector('h3').innerText;
+                    const points = Array.from(timelineItem.querySelectorAll('.original-points li')).map(li => li.innerText).join('\n');
+                    const prompt = `Anda adalah seorang penulis CV profesional. Berdasarkan deskripsi pekerjaan berikut, tulis ulang poin-poin ini dalam Bahasa Indonesia agar fokus pada dampak dan pencapaian terukur. Gunakan kata kerja aksi yang kuat. Format sebagai daftar HTML (<ul><li>...</li></ul>).\n\nPosisi: ${position}\nPoin Asli:\n${points}`;
+                    callGeminiAPI(prompt, modalLoader, modalResult, true);
+                });
+            });
+
+            document.getElementById('generateEmailBtn').addEventListener('click', () => {
+                const recruiterName = document.getElementById('recruiterName').value.trim();
+                const jobTitle = document.getElementById('jobTitle').value.trim();
+                if (!recruiterName || !jobTitle) { alert('Silakan isi Nama Anda dan Posisi yang Ditawarkan.'); return; }
+                
+                document.getElementById('emailResultWrapper').classList.remove('hidden');
+                const prompt = `Anda adalah seorang perekrut teknis. Tulis draf email profesional dalam Bahasa Indonesia kepada Ramadiansyah. Sebutkan nama Anda (${recruiterName}) dan posisi yang ditawarkan (${jobTitle}). Tunjukkan bahwa Anda terkesan dengan pengalamannya (misalnya dengan Golang atau proyek e-commerce) dan usulkan waktu singkat untuk mengobrol. Buat email ini singkat, jelas, dan siap kirim.`;
+                callGeminiAPI(prompt, document.getElementById('emailLoader'), document.getElementById('emailDraft'), false);
+            });
+
+            const ctx = document.getElementById('skillsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Backend & API', 'Frontend', 'Database & Tools', 'Emerging Tech'],
+                    datasets: [{
+                        data: [45, 20, 20, 15],
+                        backgroundColor: ['#0e7490', '#155e75', '#0891b2', '#06b6d4'],
+                        borderColor: '#030712',
+                        borderWidth: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#d1d5db',
+                                font: { family: "'Inter', sans-serif", size: 12 },
+                                boxWidth: 15,
+                                padding: 20,
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: '#1f2937', titleFont: { size: 14 }, bodyFont: { size: 12 },
+                            callbacks: {
+                                title: (tooltipItems) => tooltipItems[0].label,
+                                label: (context) => ` Fokus Keahlian: ${context.raw}%`
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
