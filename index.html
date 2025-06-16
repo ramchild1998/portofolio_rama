@@ -695,7 +695,7 @@
                 resultElement.innerHTML = '';
                 if(isModal) geminiModal.classList.remove('hidden');
 
-                const apiKey = ""; 
+                const apiKey = "AIzaSyC3tMxUqnkIzP9VtuT2-u0RNqmq9zZD6yw"; 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
 
