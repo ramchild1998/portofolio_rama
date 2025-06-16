@@ -640,7 +640,9 @@
         </div>
     </footer>
 
-    <script>
+    <script type="module">
+        import { getGeminiApiKey } from './config.js';
+        
         document.addEventListener('DOMContentLoaded', function () {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -695,12 +697,19 @@
                 resultElement.innerHTML = '';
                 if(isModal) geminiModal.classList.remove('hidden');
 
-                const apiKey = "AIzaSyC3tMxUqnkIzP9VtuT2-u0RNqmq9zZD6yw"; 
+                const apiKey = getGeminiApiKey();
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
 
                 try {
-                    const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                    const response = await fetch(apiUrl, { 
+                        method: 'POST', 
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'X-API-Key': apiKey // Menambahkan header keamanan tambahan
+                        }, 
+                        body: JSON.stringify(payload) 
+                    });
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                     
                     const result = await response.json();
