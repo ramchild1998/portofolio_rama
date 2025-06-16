@@ -158,22 +158,36 @@
             position: relative;
             display: inline-block;
             min-height: 1.2em;
+            width: 100%;
+            overflow: hidden;
         }
         
         .typing-text {
-            overflow: hidden;
             white-space: nowrap;
-            border-right: 3px solid #22d3ee;
-            animation: typing 3.5s steps(40, end),
-                       blink-caret 0.75s step-end infinite;
-            margin: 0 auto;
             display: inline-block;
+            width: 100%;
+            color: #22d3ee;
+            font-weight: 800;
+            text-shadow: 0 0 5px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.3);
+            animation: revealText 2s steps(40, end) forwards, glowEffect 2s infinite alternate;
+        }
+        
+        @media (max-width: 768px) {
+            .typing-text {
+                font-size: 2.5rem;
+                line-height: 1.2;
+                color: #22d3ee;
+            }
+            
+            .role-text {
+                font-size: 1.25rem;
+            }
         }
         
         .role-text {
             opacity: 0;
             transform: translateY(20px);
-            transition: all 0.5s ease;
+            transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
         
         .role-text.visible {
@@ -181,41 +195,20 @@
             transform: translateY(0);
         }
         
-        .typing-text::after {
-            content: '|';
-            position: absolute;
-            right: 0;
-            animation: blink 1s infinite;
+        @keyframes revealText {
+            from { clip-path: inset(0 100% 0 0); }
+            to { clip-path: inset(0 0 0 0); }
         }
         
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-        
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: #22d3ee }
-        }
-        
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0; }
+        @keyframes glowEffect {
+            0% { text-shadow: 0 0 5px rgba(34, 211, 238, 0.5), 0 0 10px rgba(34, 211, 238, 0.3); }
+            100% { text-shadow: 0 0 15px rgba(34, 211, 238, 0.8), 0 0 25px rgba(34, 211, 238, 0.6); }
         }
         
         .typing-effect {
             display: inline-block;
             overflow: hidden;
             white-space: nowrap;
-            animation: typing 3.5s steps(40, end),
-                       blink-caret 0.75s step-end infinite;
-        }
-        
-        .typing-effect::after {
-            content: '|';
-            position: absolute;
-            right: 0;
-            animation: blink 1s infinite;
         }
         
         .typing-wrapper {
@@ -223,16 +216,6 @@
             display: inline-block;
         }
         
-        .typing-wrapper::after {
-            content: '';
-            position: absolute;
-            right: -3px;
-            top: 0;
-            height: 100%;
-            width: 3px;
-            background-color: #22d3ee;
-            animation: blink 1s infinite;
-        }
         .scroll-indicator {
             position: absolute;
             bottom: 2rem;
@@ -349,7 +332,7 @@
             <div class="container mx-auto px-6 grid md:grid-cols-3 gap-10 items-center">
                 <div class="md:col-span-2 text-center md:text-left">
                     <div class="typing-container">
-                        <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight typing-text">RAMADIANSYAH, S.T.</h1>
+                        <h1 class="text-4xl md:text-6xl font-extrabold leading-tight typing-text">RAMADIANSYAH, S.T.</h1>
                     </div>
                     <p class="mt-4 text-xl md:text-2xl text-cyan-400 font-medium role-text">Full-Stack & Backend Developer</p>
                     <p class="mt-6 text-lg text-gray-400 max-w-xl mx-auto md:mx-0">
@@ -885,38 +868,26 @@
                 });
             });
 
-            // Enhanced typing effect
-            const typingText = document.querySelector('.typing-text');
+            // Logika typing effect lama telah dihapus dan digantikan oleh CSS
             const roleText = document.querySelector('.role-text');
-            const text = typingText.textContent;
-            typingText.textContent = '';
             
-            let charIndex = 0;
-            const typeChar = () => {
-                if (charIndex < text.length) {
-                    typingText.textContent += text.charAt(charIndex);
-                    charIndex++;
-                    setTimeout(typeChar, 100);
-                } else {
-                    // Start blinking cursor animation
-                    typingText.style.borderRight = '3px solid #22d3ee';
-                    // Show role text after typing is complete
-                    setTimeout(() => {
-                        roleText.classList.add('visible');
-                    }, 500);
-                }
-            };
+            // Tampilkan role text setelah animasi revealText selesai (2 detik + 0.5 detik delay)
+            setTimeout(() => {
+                roleText.classList.add('visible');
+            }, 2500);
             
-            // Start typing animation
-            setTimeout(typeChar, 1000);
-            
-            // Restart typing animation on scroll to top
+            // Tambahkan listener untuk mereset animasi saat kembali ke atas halaman
             window.addEventListener('scroll', () => {
                 if (window.scrollY === 0) {
-                    charIndex = 0;
-                    typingText.textContent = '';
+                    // Reset animasi dengan menghapus dan menambahkan kembali class
+                    const typingText = document.querySelector('.typing-text');
+                    typingText.style.animation = 'none';
+                    void typingText.offsetWidth; /* Trigger reflow */
+                    typingText.style.animation = 'revealText 2s steps(40, end) forwards, glowEffect 2s infinite alternate';
                     roleText.classList.remove('visible');
-                    setTimeout(typeChar, 1000);
+                    setTimeout(() => {
+                        roleText.classList.add('visible');
+                    }, 2500);
                 }
             });
         });
