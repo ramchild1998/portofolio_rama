@@ -641,7 +641,7 @@
     </footer>
 
     <script type="module">
-        import { getGeminiApiKey } from './config.js';
+        import { getApiKey, getApiUrl } from './config.js';
         
         document.addEventListener('DOMContentLoaded', function () {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -697,17 +697,21 @@
                 resultElement.innerHTML = '';
                 if(isModal) geminiModal.classList.remove('hidden');
 
-                const apiKey = getGeminiApiKey();
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+                const apiKey = getApiKey();
+                if (!apiKey) {
+                    const errorText = 'API key tidak ditemukan. Silakan konfigurasi API key di file config.js';
+                    if(isModal) resultElement.innerHTML = errorText; else resultElement.value = errorText;
+                    loaderElement.classList.add('hidden');
+                    return;
+                }
+
+                const apiUrl = `${getApiUrl()}?key=${apiKey}`;
                 const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
 
                 try {
                     const response = await fetch(apiUrl, { 
                         method: 'POST', 
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'X-API-Key': apiKey // Menambahkan header keamanan tambahan
-                        }, 
+                        headers: { 'Content-Type': 'application/json' }, 
                         body: JSON.stringify(payload) 
                     });
                     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);

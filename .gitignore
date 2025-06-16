@@ -1,19 +1,13 @@
 # Konfigurasi
 config.js
 
-# Environment variables
-.env
+# File sistem
+.DS_Store
+Thumbs.db
 
-# IDE
-.vscode/
-.idea/
-
-# Logs
+# File log
 *.log
 
-# Dependencies
-node_modules/
-
-# Build files
-dist/
-build/ 
+# File environment
+.env
+ 
