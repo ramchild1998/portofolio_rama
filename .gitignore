@@ -1,13 +1,4 @@
-# Konfigurasi
-config.js
-
-# File sistem
-.DS_Store
-Thumbs.db
-
-# File log
-*.log
-
-# File environment
 .env
- 
+.env.local
+.env.*.local
+config.js 

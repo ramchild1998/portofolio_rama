@@ -6,6 +6,7 @@
     <title>Portofolio | Ramadiansyah, S.T.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="config.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -640,9 +641,7 @@
         </div>
     </footer>
 
-    <script type="module">
-        import { getApiKey, getApiUrl } from './config.js';
-        
+    <script>
         document.addEventListener('DOMContentLoaded', function () {
             const mobileMenuButton = document.getElementById('mobile-menu-button');
             const mobileMenu = document.getElementById('mobile-menu');
@@ -697,24 +696,27 @@
                 resultElement.innerHTML = '';
                 if(isModal) geminiModal.classList.remove('hidden');
 
-                const apiKey = getApiKey();
-                if (!apiKey) {
-                    const errorText = 'API key tidak ditemukan. Silakan konfigurasi API key di file config.js';
-                    if(isModal) resultElement.innerHTML = errorText; else resultElement.value = errorText;
-                    loaderElement.classList.add('hidden');
-                    return;
-                }
-
-                const apiUrl = `${getApiUrl()}?key=${apiKey}`;
-                const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
-
                 try {
+                    // Validasi API key
+                    if (!validateApiKey()) {
+                        throw new Error('API key tidak valid');
+                    }
+
+                    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${config.GEMINI_API_KEY}`;
+                    const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }] };
+
                     const response = await fetch(apiUrl, { 
                         method: 'POST', 
-                        headers: { 'Content-Type': 'application/json' }, 
+                        headers: { 
+                            'Content-Type': 'application/json'
+                        }, 
                         body: JSON.stringify(payload) 
                     });
-                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error?.message || 'Unknown error'}`);
+                    }
                     
                     const result = await response.json();
                     let text = 'Maaf, tidak dapat menghasilkan konten saat ini.';
@@ -724,7 +726,7 @@
                     if(isModal) resultElement.innerHTML = text; else resultElement.value = text;
                 } catch (error) {
                     console.error("Error calling Gemini API:", error);
-                    const errorText = 'Terjadi kesalahan saat menghubungi API. Silakan coba lagi nanti.';
+                    const errorText = `Terjadi kesalahan: ${error.message}`;
                     if(isModal) resultElement.innerHTML = errorText; else resultElement.value = errorText;
                 } finally {
                     loaderElement.classList.add('hidden');
